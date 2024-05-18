@@ -1,6 +1,7 @@
 from tkinter import *
 from main import characters, continents
 
+
 colors = {'black': "black", 'grey': "grey", 'white': "white", 'green': "#4C796A"}
 
 
@@ -22,7 +23,7 @@ class App:
 
         f_head = Frame(self.window, bg=colors['green'], bd=8)
 
-        advanced_list = ["All", "Character", "Continent"]
+        advanced_list = ["All", "Name", "Family", "Continent", "Title"]
 
         sf_search = Frame(f_head, bg=colors['white'], bd=1)
         self.string_advanced = StringVar(self.window)
@@ -58,7 +59,7 @@ class App:
         y_list_left = Scrollbar(sf_listbox, orient=VERTICAL, command=self.listbox.yview, bd=5)
         y_list_left.grid(row=1, column=0, sticky=N + S)
         self.listbox.grid(row=1, column=1)
-        self.listbox.config(yscrollcommand=y_list_left.set)
+        self.listbox.config(yscrollcommand=y_list_left.set, selectbackground=colors['grey'])
         sf_listbox.grid(row=1, column=1)
 
         buttons_field = Frame(sf_listbox)
@@ -81,31 +82,65 @@ class App:
 
         sf_text = Frame(f_right, bg=colors['white'], bd=3)
         self.text = Text(sf_text, font=("Consolas", 10, "bold"), bg=colors['grey'], width=50, height=31, bd=15)
+        self.text.config(blockcursor=True, selectbackground=colors['grey'], state=DISABLED)
         y_text_right = Scrollbar(sf_text, orient=VERTICAL, command=self.text.yview, bd=5)
         y_text_right.grid(row=1, column=1, sticky=N + S)
-        self.text.grid(row=1, column=0)
         self.text.config(yscrollcommand=y_text_right.set)
+        self.text.grid(row=1, column=0)
         sf_text.pack()
 
         f_right.pack(side=RIGHT)
-
-        f_foot = Frame(self.window, bg=colors['black'])
-        pass
-        f_foot.pack(side=BOTTOM)
 
         self.window.mainloop()
 
     def search(self):
 
         advanced = self.string_advanced.get()
-        searched = self.entry_search.get()
+        searched = self.entry_search.get().title()
+        message = 'no'
+        founded = False
 
-        print("Advanced:{}\nSearch:{}".format(advanced, searched))
+        captured = list()
+
+        for i in characters:
+            for j in i:
+                if j == 'fullName':
+                    if i[j] == searched:
+                        founded = True
+                        message = 'ok'
+
+                        captured.append(i)
+
+                if j == 'firstName':
+                    if i[j] == searched:
+                        founded = True
+                        message = 'ok'
+
+                        captured.append(i)
+
+                if j == 'lastName':
+                    if i[j] == searched:
+                        founded = True
+                        message = 'ok'
+
+                        captured.append(i)
+
+        if founded:
+            self.text.config(state=NORMAL)
+            self.text.delete(1.0, END)
+
+            for i in captured:
+                self.text.insert(END, f"{'-'*45}\n")
+                for j in i:
+                    self.text.insert(END, f'{j}: {i[j]}\n\n')
+            self.text.config(state=DISABLED)
+
+        print("Advanced:{}\nSearch:{}\n{}".format(advanced, searched, message))
 
     def _show_characters(self):
 
         for i in characters:
-            string = f"{i['firstName']} {i['lastName']}"
+            string = f"{i['fullName']}"
             self.__all_characters[string] = i
 
             self.listbox.insert(END, string)
@@ -118,19 +153,19 @@ class App:
 
             self.listbox.insert(END, string)
 
-    def eraser_list(self):
+    def _eraser_list(self):
         self.listbox.delete(0, END)
 
-    def do_checks(self):
+    def _do_checks(self):
 
-        self.eraser_list()
+        self._eraser_list()
 
         self.__characters_values = self.check_dict["all characters"].get()
         self.__continent_values = self.check_dict["all continents"].get()
 
     def process(self):
 
-        self.do_checks()
+        self._do_checks()
 
         if self.__continent_values:
             self._show_continents()
@@ -138,6 +173,8 @@ class App:
             self._show_characters()
 
     def do_select(self):
+
+        self.text.config(state=NORMAL)
 
         self.text.delete(1.0, END)
 
@@ -165,5 +202,8 @@ class App:
                 string = f"{title.title()}: {data}\n\n"
                 self.text.insert(END, string)
 
+        self.text.config(state=DISABLED)
+
 
 App()
+

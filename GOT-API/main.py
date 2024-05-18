@@ -13,19 +13,31 @@ continent_required = requests.get(f'{address}{continents_key}')
 continents = json.loads(continent_required.text)
 
 
-def make_request(complement):
-    page = ''
-    if complement == "all characters":
-        page = "characters"
-    elif complement == "all continents":
-        page = "continents"
-
-    request = requests.get(f'{address}{page}')
-    list_required = json.loads(request.text)
-
-    return list_required
-
+families = dict()
+for i in characters:
+    unknown = ['Unknown', 'None', 'Unkown', '']
+    for j in i:
+        if j == 'family':
+            if i[j][:5] == 'House':
+                families[i[j][6:]] = list()
+            elif i[j] in unknown:
+                families['Unknown'] = list()
+            else:
+                families[i[j]] = list()
 
 for i in characters:
+    unknown = ['Unknown', 'None', 'Unkown', '']
     for j in i:
-        print(j)
+        if j == 'family':
+            if i[j][:5] == 'House':
+                families[i[j][6:]].append((i['fullName'], i['id']))
+            elif i[j] in unknown:
+                families['Unknown'].append((i['fullName'], i['id']))
+            else:
+                families[i[j]].append((i['fullName'], i['id']))
+
+
+for i in families:
+    print(i)
+    print(families[i])
+
